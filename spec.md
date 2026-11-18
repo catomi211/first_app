@@ -23,11 +23,14 @@ Analysis assumes linear elastic behavior, prismatic members, small deflection th
 - Each point load includes:
   - Magnitude in kips
   - Position along the beam in feet from the left support
+  - Direction: downward or upward
 - The user may add or remove multiple uniformly distributed loads
 - Each uniform load includes:
   - Magnitude in kip/ft
   - Start position and end position in feet from the left support
-- Loads act downward
+  - Direction: downward or upward
+- Downward loads use arrows pointing downward above the beam
+- Upward loads use arrows pointing upward below the beam
 - Uniform loads may cover the full span
 - The beam self-weight may be included or excluded, and the selected assumption must be stated clearly
 - Load magnitudes must represent a consistent treatment of individual loads or load combinations
@@ -59,7 +62,7 @@ Analysis assumes linear elastic behavior, prismatic members, small deflection th
 - Determine support reactions using static equilibrium
 - For simply supported beams, calculate vertical reactions using moment equilibrium and vertical force equilibrium
 - For cantilever beams, calculate the fixed-end vertical reaction and fixed-end moment
-- Assume vertical downward loads and neglect axial effects
+- Assume vertical loads in the selected downward or upward direction and neglect axial effects
 
 ### Shear and moment diagrams
 - Construct shear and moment diagrams along the full beam
@@ -115,11 +118,26 @@ Analysis assumes linear elastic behavior, prismatic members, small deflection th
 - Use purple as the primary accent color
 - Use black text throughout for strong readability
 - Place beam controls on the right side of the screen
-- Place the beam drawing and diagrams on the main left side
+- Place the beam drawing, pass/fail section, and diagrams on the main left side
 - Open with a valid example beam and a complete set of example results
 - Use pastel purple for active controls, selected states, and diagram accents
-- Use a distinct pastel color for each diagram or load type without reducing text contrast
+- Use light lavender, pastel blue, pastel green, and pastel pink for metric cards and clearly distinguish metric values
+- Display the maximum-moment metric in a pastel green card
+- Label the right-side control sections as "Beam inputs," "Load inputs," and "Member inputs"
+- Place pass/fail cards directly below the beam reaction and key-result metrics
+- Stack the shear, moment, and deflection diagrams vertically in separate cards
+- Use the same purple line and fill treatment for all three diagrams
+- Use a crisp black beam line with evenly spaced length tick marks and numerical span labels
+- Draw the simply supported reaction supports below the beam with black triangular supports and grounded hatching
+- Draw the cantilever support as a black fixed support below the left end of the beam
+- Draw point loads as separate vertical purple arrows with each downward-load label directly above its arrow
+- Draw downward distributed loads above the beam with evenly spaced arrows pointing down toward the beam
+- Draw upward distributed loads below the beam with evenly spaced arrows pointing up toward the beam
+- Keep point-load and distributed-load arrows in separate visual bands so they do not overlap
+- Add a small kawaii-style black-and-white panda on a light pastel-purple rounded square in the header
 - Keep pass states green and fail states red, with text labels and icons so color is not the only indicator
+- Use a thick, sharp-cornered green checkmark for pass states
+- Use a thick, centered red X for fail states
 - Use clear labels, readable chart axes, units, and gridlines
 - Clearly separate controls, diagrams, and pass/fail results into labeled sections
 - Support narrow screens by stacking the controls below the beam and diagrams

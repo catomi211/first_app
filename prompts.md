@@ -148,3 +148,21 @@
 - **Asked:** Build Stage 2 of spec.md with interactive controls and validation, keeping calculations separate from drawing code.
 - **Changed:** Added live support/member selection, load add/remove controls, span and load/member validation, member property updates, hidden placeholder results for invalid input, and named calculation functions for counts, member properties, and validation state.
 - **Worked:** Source verification only; browser automation was unavailable.
+
+## 2026-11-18
+
+- **Asked:** Build Stage 3 of spec.md: beam drawing, reactions, shear, and moment calculations only.
+- **Changed:** Added separate functions for collecting beam state, calculating reactions, calculating shear and moment, drawing the beam, and drawing shear/moment plots. Live outputs now update after valid input changes.
+- **Worked:** Source structure verified. The implementation contains the specified simply-supported and cantilever reaction/moment branches.
+
+## 2026-11-18
+
+- **Asked:** Make spec.md match the current Beam Designer HTML, especially look-and-feel details and reversed load-arrowheads.
+- **Changed:** Added panda branding, stacked diagrams, metric/check placement, control section names, crisp black supports, tick marks, point/distributed-load separation, reversed arrowheads, and thick pass/fail icons to the spec. Updated the HTML arrowhead geometry consistently.
+- **Worked:** Yes by source review.
+
+## 2026-11-18
+
+- **Asked:** Correct load arrowheads and support upward distributed loads below the beam.
+- **Changed:** Made point and distributed arrows point downward by default, added upward/downward direction controls, drew upward loads below the beam with upward-pointing arrows, and updated calculations to use signed load directions.
+- **Worked:** Source verification; browser automation was unavailable.
