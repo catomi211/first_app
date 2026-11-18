@@ -203,6 +203,82 @@
       display: block;
     }
 
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .comparison-card {
+      padding: 14px 16px 16px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .cut-summary {
+      display: grid;
+      grid-template-columns: minmax(120px, 150px) minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+      min-height: 170px;
+    }
+
+    .section-sketch {
+      width: 100%;
+      min-width: 0;
+      height: 150px;
+      border-radius: 12px;
+      background: var(--lavender);
+      display: grid;
+      place-items: center;
+    }
+
+    .section-sketch svg {
+      width: 138px;
+      height: 138px;
+    }
+
+    .cut-values {
+      display: grid;
+      gap: 7px;
+      margin: 0;
+    }
+
+    .cut-values div {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #eee6ef;
+    }
+
+    .cut-values div:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .cut-values dt {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .cut-values dd {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 900;
+      text-align: left;
+      min-width: 0;
+      white-space: nowrap;
+    }
+
+    .cut-controls-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
     .checks-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -431,6 +507,11 @@
       .metrics-grid { grid-template-columns: 1fr 1fr; }
       .plots-grid { grid-template-columns: 1fr; }
       .checks-grid { grid-template-columns: 1fr; }
+      .comparison-grid { grid-template-columns: 1fr; }
+      .cut-controls-grid { grid-template-columns: 1fr; }
+      .cut-summary {
+        grid-template-columns: 120px minmax(0, 1fr);
+      }
       .beam-canvas { height: 205px; }
     }
 
@@ -652,6 +733,75 @@
             </g>
           </svg>
         </article>
+      </section>
+
+      <section class="panel" id="section-comparison" aria-label="Section comparison">
+        <div class="panel-heading">
+          <h2>Section comparison</h2>
+          <span class="unit-label" id="cut-legend">Cuts along the beam</span>
+        </div>
+        <div class="control-body">
+          <div class="cut-controls-grid">
+            <div class="field">
+              <label for="cut1-position">Cut 1 location (ft)</label>
+              <input id="cut1-position" type="number" value="5" min="0" step="0.1" data-cut="1">
+            </div>
+            <div class="field">
+              <label for="cut2-position">Cut 2 location (ft)</label>
+              <input id="cut2-position" type="number" value="15" min="0" step="0.1" data-cut="2">
+            </div>
+          </div>
+
+          <div class="comparison-grid">
+            <article class="panel comparison-card">
+              <div class="panel-heading" style="margin: -14px -16px 12px">
+                <h2>Cut 1</h2>
+                <span class="unit-label" id="cut1-location">5.0 ft</span>
+              </div>
+              <div class="cut-summary">
+                <div class="section-sketch" aria-label="Cross-section sketch for Cut 1">
+                  <svg viewBox="0 0 138 138" role="img">
+                    <rect x="43" y="18" width="52" height="102" rx="3" fill="#fffafd" stroke="#17151a" stroke-width="4"/>
+                    <rect x="32" y="18" width="74" height="12" rx="2" fill="#7654a7" stroke="#503779" stroke-width="2"/>
+                    <rect x="32" y="108" width="74" height="12" rx="2" fill="#7654a7" stroke="#503779" stroke-width="2"/>
+                    <line x1="69" y1="10" x2="69" y2="128" stroke="#bfa4d4" stroke-width="2" stroke-dasharray="5 5"/>
+                    <line x1="20" y1="69" x2="118" y2="69" stroke="#bfa4d4" stroke-width="2" stroke-dasharray="5 5"/>
+                  </svg>
+                </div>
+                <dl class="cut-values">
+                  <div><dt>Shear</dt><dd id="cut1-shear">-- kip</dd></div>
+                  <div><dt>Moment</dt><dd id="cut1-moment">-- kip-ft</dd></div>
+                  <div><dt>Bending stress</dt><dd id="cut1-stress">-- ksi</dd></div>
+                  <div><dt>Deflection slope</dt><dd id="cut1-slope">-- rad</dd></div>
+                </dl>
+              </div>
+            </article>
+
+            <article class="panel comparison-card">
+              <div class="panel-heading" style="margin: -14px -16px 12px">
+                <h2>Cut 2</h2>
+                <span class="unit-label" id="cut2-location">15.0 ft</span>
+              </div>
+              <div class="cut-summary">
+                <div class="section-sketch" aria-label="Cross-section sketch for Cut 2">
+                  <svg viewBox="0 0 138 138" role="img">
+                    <rect x="43" y="18" width="52" height="102" rx="3" fill="#fffafd" stroke="#17151a" stroke-width="4"/>
+                    <rect x="32" y="18" width="74" height="12" rx="2" fill="#7654a7" stroke="#503779" stroke-width="2"/>
+                    <rect x="32" y="108" width="74" height="12" rx="2" fill="#7654a7" stroke="#503779" stroke-width="2"/>
+                    <line x1="69" y1="10" x2="69" y2="128" stroke="#bfa4d4" stroke-width="2" stroke-dasharray="5 5"/>
+                    <line x1="20" y1="69" x2="118" y2="69" stroke="#bfa4d4" stroke-width="2" stroke-dasharray="5 5"/>
+                  </svg>
+                </div>
+                <dl class="cut-values">
+                  <div><dt>Shear</dt><dd id="cut2-shear">-- kip</dd></div>
+                  <div><dt>Moment</dt><dd id="cut2-moment">-- kip-ft</dd></div>
+                  <div><dt>Bending stress</dt><dd id="cut2-stress">-- ksi</dd></div>
+                  <div><dt>Deflection slope</dt><dd id="cut2-slope">-- rad</dd></div>
+                </dl>
+              </div>
+            </article>
+          </div>
+        </div>
       </section>
 
     </section>
@@ -1183,6 +1333,116 @@
       renderStatusPill(document.querySelector("#deflection-status"), deflectionCheck.passes);
     }
 
+    function getNearestModelPoint(points, location) {
+      if (!points.length) return null;
+      let nearest = points[0];
+      points.forEach((point) => {
+        if (Math.abs(point.x - location) < Math.abs(nearest.x - location)) {
+          nearest = point;
+        }
+      });
+      return nearest;
+    }
+
+    function interpolateBeamValue(points, location, valueKey) {
+      if (!points.length) return 0;
+      if (location <= points[0].x) return points[0][valueKey];
+      if (location >= points[points.length - 1].x) return points[points.length - 1][valueKey];
+
+      for (let i = 1; i < points.length; i++) {
+        const left = points[i - 1];
+        const right = points[i];
+        if (location >= left.x && location <= right.x) {
+          const span = right.x - left.x;
+          if (span === 0) return left[valueKey];
+          const fraction = (location - left.x) / span;
+          return left[valueKey] + (right[valueKey] - left[valueKey]) * fraction;
+        }
+      }
+      return 0;
+    }
+
+    function calculateCutValues(model, cutLocation) {
+      const shearAndMoment = calculateShearAndMoment(model);
+      const deflection = calculateDeflection(model, shearAndMoment);
+      const memberType = document.querySelector("#member-type").value;
+      const designation = document.querySelector("#designation").value;
+      const member = calculateMemberProperties(memberType, designation);
+
+      const shear = interpolateBeamValue(shearAndMoment.points, cutLocation, "shear");
+      const moment = interpolateBeamValue(shearAndMoment.points, cutLocation, "moment");
+      const nearestDeflection = getNearestModelPoint(deflection.points, cutLocation * 12);
+      const nearestIndex = deflection.points.indexOf(nearestDeflection);
+
+      let slope = 0;
+      if (nearestIndex > 0 && nearestIndex < deflection.points.length - 1) {
+        const left = deflection.points[nearestIndex - 1];
+        const right = deflection.points[nearestIndex + 1];
+        slope = (right.deflection - left.deflection) / (right.x - left.x);
+      } else if (nearestIndex === 0 && deflection.points.length > 1) {
+        const right = deflection.points[1];
+        slope = right.deflection / right.x;
+      } else if (nearestIndex > 0) {
+        const left = deflection.points[nearestIndex - 1];
+        const right = deflection.points[nearestIndex];
+        slope = (right.deflection - left.deflection) / (right.x - left.x);
+      }
+
+      const stress = member.S > 0 ? Math.abs(moment * 12) / member.S : Infinity;
+      return { location: cutLocation, shear, moment, stress, slope };
+    }
+
+    function validateCutLocations(model) {
+      const cutInputs = [
+        document.querySelector("#cut1-position"),
+        document.querySelector("#cut2-position")
+      ];
+      const errors = [];
+
+      cutInputs.forEach((input) => {
+        input.classList.remove("invalid");
+        const cut = getNumericValue(input);
+        if (cut === null || cut < 0 || cut > model.span) {
+          input.classList.add("invalid");
+          errors.push(`Cut ${input.dataset.cut} must be between 0 ft and ${model.span.toFixed(1)} ft.`);
+        }
+      });
+      return errors;
+    }
+
+    function renderCutCard(number, cutValues) {
+      document.querySelector(`#cut${number}-location`).textContent =
+        `${cutValues.location.toFixed(1)} ft`;
+      document.querySelector(`#cut${number}-shear`).textContent =
+        `${cutValues.shear >= 0 ? "+" : ""}${cutValues.shear.toFixed(2)} kip`;
+      document.querySelector(`#cut${number}-moment`).textContent =
+        `${cutValues.moment >= 0 ? "+" : ""}${cutValues.moment.toFixed(2)} kip-ft`;
+      document.querySelector(`#cut${number}-stress`).textContent =
+        `${cutValues.stress.toFixed(2)} ksi`;
+      document.querySelector(`#cut${number}-slope`).textContent =
+        `${cutValues.slope >= 0 ? "+" : ""}${cutValues.slope.toFixed(6)} rad`;
+    }
+
+    function updateSectionComparison() {
+      const model = collectBeamModel();
+      const cutErrors = validateCutLocations(model);
+      const sectionComparison = document.querySelector("#section-comparison");
+
+      if (cutErrors.length > 0) {
+        sectionComparison.querySelector(".comparison-grid").hidden = true;
+        document.querySelector("#cut-legend").textContent = cutErrors[0];
+        return;
+      }
+
+      sectionComparison.querySelector(".comparison-grid").hidden = false;
+      document.querySelector("#cut-legend").textContent = "Cuts along the beam";
+
+      const cut1 = getNumericValue(document.querySelector("#cut1-position"));
+      const cut2 = getNumericValue(document.querySelector("#cut2-position"));
+      renderCutCard(1, calculateCutValues(model, cut1));
+      renderCutCard(2, calculateCutValues(model, cut2));
+    }
+
     function drawPathFromPoints(svg, points, valueKey, axisY, top, bottom, left = 35, right = 400) {
       if (!points.length) return;
       const span = points[points.length - 1].x || 1;
@@ -1252,6 +1512,22 @@
       const beamY = 148;
       const width = right - left;
       const xAt = (position) => left + (position / model.span) * width;
+
+      let cutMarkerMarkup = "";
+      const cutInputs = [
+        document.querySelector("#cut1-position"),
+        document.querySelector("#cut2-position")
+      ];
+      cutInputs.forEach((input, index) => {
+        const cut = getNumericValue(input);
+        if (cut !== null && cut >= 0 && cut <= model.span) {
+          const x = xAt(cut);
+          const markerColor = index === 0 ? "#7654a7" : "#503779";
+          cutMarkerMarkup += `
+            <line x1="${x}" y1="128" x2="${x}" y2="148" stroke="${markerColor}" stroke-width="3" stroke-dasharray="5 4"/>
+            <circle cx="${x}" cy="128" r="5" fill="${markerColor}" stroke="#fff" stroke-width="2"/>`;
+        }
+      });
 
       let tickMarkup = "";
       let numberLabels = "";
@@ -1337,7 +1613,8 @@
         <line class="beam-line" x1="${left}" y1="${beamY}" x2="${right}" y2="${beamY}"/>
         ${supportMarkup}
         ${distributedMarkup}
-        ${loadMarkup}`;
+        ${loadMarkup}
+        ${cutMarkerMarkup}`;
     }
 
     function updateStageThreeResults() {
@@ -1352,6 +1629,7 @@
       drawBeamModel(model);
       drawShearAndMomentPlots(results);
       updateStageFourResults();
+      updateSectionComparison();
     }
 
     function validateBeamInputs() {
@@ -1424,7 +1702,7 @@
       const note = document.querySelector(".validate-note");
       const noteText = note.querySelector("span:last-child");
       const noteIcon = note.querySelector("span:first-child");
-      const resultIds = ["key-results", "pass-fail-results", "diagram-results"];
+      const resultIds = ["key-results", "pass-fail-results", "diagram-results", "section-comparison"];
 
       if (errors.length > 0) {
         note.classList.add("error");
@@ -1556,6 +1834,8 @@
     document.querySelector("#member-type").addEventListener("change", updateMemberOptions);
     document.querySelector("#designation").addEventListener("change", updateMemberProperties);
     document.querySelector("#self-weight").addEventListener("change", updateValidationStatus);
+    document.querySelector("#cut1-position").addEventListener("input", updateValidationStatus);
+    document.querySelector("#cut2-position").addEventListener("input", updateValidationStatus);
 
     document.querySelector("#add-point-load").addEventListener("click", () => {
       const card = createPointLoadCard();

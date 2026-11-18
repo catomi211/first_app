@@ -169,6 +169,27 @@
 
 ## 2026-11-18
 
+- **Asked:** Implement the planned side-by-side two-cut section comparison.
+- **Changed:** Added cut-location controls, two responsive comparison cards, cross-section sketches, cut-value calculations, beam cut markers, validation, invalid-state hiding, and live recalculation.
+- **Changed additionally:** Stacked each cut value below its title to prevent text overlap in full-width cards.
+
+## 2026-11-18
+
+- **Asked:** Plan an export feature for a downloadable beam report and write the plan in spec.md.
+- **Changed:** Added report purpose, contents, format, export behavior, implementation stages, and acceptance checks.
+- **Worked:** Yes; no export code was added.
+- **Changed additionally:** Stacked each cut value below its title to prevent text overlap in full-width cards.
+- **Changed additionally:** Refined the comparison-card grid and cut-value spacing so both Cut 1 and Cut 2 remain contained in full-width cards.
+- **Worked:** Source structure verification; browser automation was unavailable.
+
+## 2026-11-18
+
+- **Asked:** Plan a side-by-side comparison of two beam cut locations and write the plan in spec.md.
+- **Changed:** Added a spec section covering two cut-location inputs, side-by-side cards, cross-section sketches, shear/moment/bending-stress/slope values, responsive behavior, implementation stages, and acceptance checks.
+- **Worked:** Yes; no code or HTML implementation was added.
+
+## 2026-11-18
+
 - **Asked:** Make spec.md match the current Beam Designer HTML, especially look-and-feel details and reversed load-arrowheads.
 - **Changed:** Added panda branding, stacked diagrams, metric/check placement, control section names, crisp black supports, tick marks, point/distributed-load separation, reversed arrowheads, and thick pass/fail icons to the spec. Updated the HTML arrowhead geometry consistently.
 - **Worked:** Yes by source review.

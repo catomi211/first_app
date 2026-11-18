@@ -203,3 +203,96 @@ Calculate elastic deflection using member E and I, correct boundary conditions, 
 Calculate bending stress using M/S and deflection against L/360. Add governing locations, live updates, example defaults, chart labels, keyboard controls, and responsive behavior.
 
 **Test when complete:** Verify pass and fail states with valid and failing cases. Compare final output with every Validation case and test keyboard navigation, resizing, invalid-input clearing, and the example displayed when the page opens.
+
+## Planned addition: Side-by-side section comparison
+
+### Purpose
+Allow the user to place two cut locations along the currently selected beam and compare the beam condition at both locations side by side.
+
+### User inputs
+- Cut 1 location in feet from the left end
+- Cut 2 location in feet from the left end
+- Default both cuts to valid example locations
+- Allow each cut location to be changed independently
+- Require each cut to be greater than or equal to 0 ft and less than or equal to the beam span
+
+### Comparison layout
+- Add a clearly labeled "Section comparison" area beneath the beam results
+- Display two equal-width cards labeled "Cut 1" and "Cut 2"
+- Place the cards side by side on desktop screens
+- Stack the cards vertically on narrow screens
+- Keep the existing pink, pastel-purple, black-text, and pass/fail styling
+
+### Information shown for each cut
+- A simple side-view or cross-section sketch of the selected member
+- Shear force at the cut in kips
+- Bending moment at the cut in kip-ft
+- Bending stress at the cut in ksi
+- Deflection slope at the cut in radians or in/ft, with the selected unit stated consistently
+- The cut location in feet
+- A clear indication when the cut position is invalid
+
+### Behavior
+- Recalculate both cuts whenever the beam loads, span, support type, or member selection change
+- Use the same signed convention and unit definitions as the beam diagrams
+- Mark the cut and corresponding location on the beam drawing
+- Update the comparison immediately after either cut input changes
+- Hide or clearly empty both comparison cards when any beam input is invalid
+
+### Planned implementation stages
+1. Add the two cut-location controls and validation rules
+2. Add the two comparison cards and match locations to the beam drawing
+3. Add shear, moment, bending stress, and deflection-slope values to each card
+4. Verify desktop and mobile layouts and test invalid or duplicate cut positions
+
+### Acceptance checks
+- Moving either cut updates both its label and its card values
+- Cut positions outside the span produce a clear validation message
+- A cut at 0 ft or at the full span is handled consistently
+- Both cards remain readable and equal in width at desktop size
+- Cards stack cleanly on narrow screens
+- Cross-section, force, stress, and slope values use the member and beam currently displayed
+
+## Planned addition: Downloadable beam report
+
+### Purpose
+Let the user download a simple self-contained report that shows the beam inputs and calculated outputs.
+
+### Report contents
+- Beam type and span
+- Applied point loads and uniform loads
+- Selected member, material, and section properties
+- Support reactions
+- Maximum shear and moment
+- Maximum deflection
+- Bending stress
+- Bending and deflection pass/fail states
+- Cut 1 and Cut 2 locations and values
+- A simple beam sketch or text-based beam description
+
+### Download format
+- Export a plain HTML or printable PDF-style file
+- Open or print cleanly without the app interface or interactive controls
+- Use the same pastel layout where practical, with black text and clear labels
+- Use a filename based on the project or beam designation
+
+### Export behavior
+- Place a clearly labeled "Download report" button near the result section
+- Disable or hide the export action while beam inputs are invalid
+- Export the latest valid values only
+- Include units beside every numeric value
+- Add a report timestamp and app name
+
+### Planned implementation stages
+1. Add a report-format and filename plan to the existing app controls
+2. Create a simple table for beam inputs and calculated outputs
+3. Add a generated beam sketch or clear beam description
+4. Generate and download the report as a standalone HTML file
+5. Test valid, invalid, simply supported, and cantilever exports
+
+### Acceptance checks
+- The downloaded file opens independently of the app
+- The report contains both beam data and comparison-cut data
+- Exported values match the values visible in the app
+- Invalid inputs do not create a report
+- The report is readable when printed
