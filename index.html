@@ -225,13 +225,16 @@
       border-radius: 50%;
       background: var(--green);
       color: var(--green-text);
-      font-size: 18px;
-      font-weight: 900;
     }
 
     .check-icon.fail {
       background: var(--red);
       color: var(--red-text);
+      font-family: Arial, sans-serif;
+      font-size: 22px;
+      line-height: 1;
+      text-align: center;
+      padding: 0 0 1px;
     }
 
     .check-card strong {
@@ -559,7 +562,9 @@
 
       <section class="checks-grid" aria-label="Pass and fail results">
         <article class="panel check-card">
-          <div class="check-icon" aria-hidden="true">✓</div>
+          <svg class="check-icon" viewBox="0 0 38 38" aria-hidden="true">
+            <path d="M10 20 L16 26 L28 13" fill="none" stroke="#2f6842" stroke-width="6" stroke-linecap="square" stroke-linejoin="miter"/>
+          </svg>
           <div>
             <strong>Bending stress</strong>
             <small>3.82 ksi of 24.00 ksi allowable</small>
@@ -567,7 +572,9 @@
           <span class="pass-pill">Pass</span>
         </article>
         <article class="panel check-card">
-          <div class="check-icon fail" aria-hidden="true">×</div>
+          <svg class="check-icon fail" viewBox="0 0 38 38" aria-hidden="true">
+            <path d="M12 12 L26 26 M26 12 L12 26" fill="none" stroke="#8a3838" stroke-width="5" stroke-linecap="square"/>
+          </svg>
           <div>
             <strong>Deflection</strong>
             <small>0.68 in of 0.667 in allowable</small>

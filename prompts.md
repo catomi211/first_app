@@ -118,3 +118,27 @@
 - **Asked:** Add a light pastel-purple rounded square behind the panda and make its ears smaller.
 - **Changed:** Added the #e7dafa tile styling and reduced both panda ear circles.
 - **Worked:** Yes by source verification.
+
+## 2026-11-18
+
+- **Asked:** Center the × in the red failure circle.
+- **Changed:** Added explicit failure-icon centering, font, line-height, and padding adjustments.
+- **Worked:** Yes by source verification.
+
+## 2026-11-18
+
+- **Asked:** Make the pass checkmark thicker and more consistent with the page font.
+- **Changed:** Increased the checkmark weight and adjusted its centering and spacing.
+- **Worked:** Yes by source verification.
+
+## 2026-11-18
+
+- **Asked:** Remove the curved checkmark and make it even thicker.
+- **Changed:** Replaced the text checkmark with a thick, sharp-cornered SVG check.
+- **Worked:** Yes by source verification.
+
+## 2026-11-18
+
+- **Asked:** Change only the deflection failure ×, making it thicker and centered.
+- **Changed:** Replaced the failure text × with a centered thick SVG × and made no other design changes.
+- **Worked:** Yes by source verification.
