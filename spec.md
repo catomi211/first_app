@@ -158,3 +158,30 @@ Deflections use the full beam span and include only the applied loads.
 - Connections, support settlements, and second-order effects
 - Dynamic loading, impact, fatigue, and temperature effects
 - Code-compliant design or permit documentation
+
+## Build stages
+
+### Stage 1: Page layout mockup
+Create the pink/pastel layout with a main diagram area on the left and controls on the right. Include placeholder beam, shear, moment, and deflection panels, input and results sections, example values, and pass/fail placeholders.
+
+**Test when complete:** Resize the window and verify the layout remains readable. Confirm right-side controls, pink background, purple accents, black text, pass/fail colors, and example content match the Look and feel section.
+
+### Stage 2: Interactive controls and validation
+Add support, span, load, and member controls without real calculations. Support adding and removing point and uniform loads.
+
+**Test when complete:** Add and remove loads, change support types and member selections, enter invalid span or load positions, and confirm clear validation messages. Invalid inputs must prevent placeholder results from appearing.
+
+### Stage 3: Beam drawing and reactions, shear, and moment
+Draw supports and load arrows, then calculate reactions and construct shear and moment diagrams. Start with one simple arrangement if needed, then expand to point loads, uniform loads, and cantilevers.
+
+**Test when complete:** Compare reactions and maximum moment with the Validation cases. Verify shear jumps and moment continuity at point loads and linear/quadratic behavior for uniform-load segments.
+
+### Stage 4: Deflection
+Calculate elastic deflection using member E and I, correct boundary conditions, and linear-elastic Euler-Bernoulli beam theory. Add the deflection diagram.
+
+**Test when complete:** Compare all deflection answers in the Validation cases. Verify simply supported deflection is zero at both supports and cantilever deflection and rotation are zero at the fixed end.
+
+### Stage 5: Checks and polish
+Calculate bending stress using M/S and deflection against L/360. Add governing locations, live updates, example defaults, chart labels, keyboard controls, and responsive behavior.
+
+**Test when complete:** Verify pass and fail states with valid and failing cases. Compare final output with every Validation case and test keyboard navigation, resizing, invalid-input clearing, and the example displayed when the page opens.

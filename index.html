@@ -3,8 +3,828 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project App</title>
+  <title>Beam Designer</title>
+  <style>
+    :root {
+      --pink: #fbeaf2;
+      --pink-deep: #f4cfe1;
+      --panel: #fffafd;
+      --purple: #7654a7;
+      --purple-dark: #503779;
+      --purple-pale: #e7dafa;
+      --lavender: #f2ecfb;
+      --blue: #dceaf6;
+      --peach: #f8dfd2;
+      --green: #cfe9d7;
+      --green-text: #2f6842;
+      --red: #f3d2d2;
+      --red-text: #8a3838;
+      --ink: #17151a;
+      --muted: #68616d;
+      --line: #dccfe1;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--pink);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button, input, select { font: inherit; }
+
+    button, input, select {
+      min-height: 40px;
+    }
+
+    button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 3px solid #c1a8e6;
+      outline-offset: 2px;
+    }
+
+    .app-header {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: rgba(255, 250, 253, 0.82);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(8px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      background: #e7dafa;
+      border: 0;
+      border-radius: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #77ad83;
+      box-shadow: 0 0 0 4px var(--green);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 18px;
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .main-column {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 8px 22px rgba(80, 55, 121, 0.06);
+    }
+
+    .panel-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 52px;
+      padding: 12px 16px;
+      border-bottom: 1px solid #eee6ef;
+    }
+
+    .panel-heading h2 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .unit-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .beam-panel { overflow: hidden; }
+
+    .beam-canvas {
+      height: 230px;
+      padding: 8px 14px 0;
+    }
+
+    .beam-canvas svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding: 12px 16px 16px;
+      border-top: 1px solid #eee6ef;
+    }
+
+    .metric {
+      min-width: 0;
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--lavender);
+    }
+
+    .metric:nth-child(2) { background: var(--blue); }
+    .metric:nth-child(3) { background: var(--green); }
+    .metric:nth-child(4) { background: var(--pink-deep); }
+
+    .metric-label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      font-size: 20px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .plots-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .plot-card {
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .plot-card svg {
+      width: 100%;
+      height: 172px;
+      display: block;
+    }
+
+    .checks-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .check-card {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+    }
+
+    .check-icon {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--green);
+      color: var(--green-text);
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .check-icon.fail {
+      background: var(--red);
+      color: var(--red-text);
+    }
+
+    .check-card strong {
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .check-card small {
+      color: var(--muted);
+    }
+
+    .pass-pill {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: var(--green);
+      color: var(--green-text);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: fit-content;
+    }
+
+    .control-panel { overflow: hidden; }
+
+    .control-body {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label, .field-label {
+      color: #504956;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid #d8ccd9;
+      border-radius: 9px;
+      background: white;
+      color: var(--ink);
+      padding: 8px 10px;
+    }
+
+    input:disabled, select:disabled {
+      background: #f4f0f3;
+      color: var(--muted);
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 3px;
+      border-radius: 10px;
+      background: #f1eaf3;
+    }
+
+    .segment {
+      min-height: 38px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .segment.active {
+      background: var(--purple);
+      color: white;
+      box-shadow: 0 3px 8px rgba(80, 55, 121, 0.18);
+    }
+
+    .load-card {
+      padding: 10px;
+      border: 1px solid #e4d7e5;
+      border-radius: 10px;
+      background: #fdfaff;
+    }
+
+    .load-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .remove-load {
+      width: 30px;
+      min-height: 30px;
+      border: 0;
+      border-radius: 8px;
+      background: #f2e7ef;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .add-button {
+      width: 100%;
+      border: 1px dashed var(--purple);
+      border-radius: 9px;
+      background: var(--lavender);
+      color: var(--purple-dark);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      font-size: 13px;
+    }
+
+    .check-row input {
+      width: 18px;
+      min-height: 18px;
+    }
+
+    .validate-note {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      padding: 10px;
+      border-radius: 9px;
+      background: var(--green);
+      color: var(--green-text);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .axis { stroke: #8d8290; stroke-width: 1; }
+    .grid { stroke: #eee6ef; stroke-width: 1; }
+    .beam-line { stroke: var(--ink); stroke-width: 6; stroke-linecap: square; }
+    .purple-line { fill: none; stroke: var(--purple); stroke-width: 3; }
+    .blue-line { fill: none; stroke: var(--purple); stroke-width: 3; }
+    .peach-line { fill: none; stroke: var(--purple); stroke-width: 3; }
+    .purple-fill { fill: #dcd0f1; fill-opacity: 0.72; }
+    .blue-fill { fill: #dcd0f1; fill-opacity: 0.72; }
+    .peach-fill { fill: #dcd0f1; fill-opacity: 0.72; }
+
+    @media (max-width: 980px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+      .controls {
+        grid-row: 2;
+      }
+      .main-column {
+        grid-row: 1;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .app-header { padding: 0 16px; }
+      .header-meta span:last-child { display: none; }
+      .workspace { padding: 10px; }
+      .metrics-grid { grid-template-columns: 1fr 1fr; }
+      .plots-grid { grid-template-columns: 1fr; }
+      .checks-grid { grid-template-columns: 1fr; }
+      .beam-canvas { height: 205px; }
+    }
+
+    @media (max-width: 420px) {
+      .metrics-grid { grid-template-columns: 1fr; }
+      .field-row { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
+  <header class="app-header">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 38 38" role="img" aria-label="Cute panda">
+        <circle cx="19" cy="20" r="13" fill="#fff"/>
+        <circle cx="8.5" cy="10.5" r="4" fill="#17151a"/>
+        <circle cx="29.5" cy="10.5" r="4" fill="#17151a"/>
+        <ellipse cx="13.5" cy="19" rx="4.5" ry="5.5" fill="#17151a" transform="rotate(25 13.5 19)"/>
+        <ellipse cx="24.5" cy="19" rx="4.5" ry="5.5" fill="#17151a" transform="rotate(-25 24.5 19)"/>
+        <circle cx="13.5" cy="19" r="1.4" fill="#fff"/>
+        <circle cx="24.5" cy="19" r="1.4" fill="#fff"/>
+        <ellipse cx="19" cy="25" rx="3.2" ry="2.4" fill="#17151a"/>
+        <path d="M19 27 Q16.5 29.5 14.5 27.5 M19 27 Q21.5 29.5 23.5 27.5" fill="none" stroke="#17151a" stroke-width="1" stroke-linecap="round"/>
+        <circle cx="10" cy="25" r="2" fill="#f4b8ca"/>
+        <circle cx="28" cy="25" r="2" fill="#f4b8ca"/>
+      </svg>
+      <h1>Beam Designer</h1>
+    </div>
+    <div class="header-meta" aria-label="Example beam status">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span>Example beam loaded</span>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="main-column" aria-label="Beam results">
+      <section class="panel beam-panel">
+        <div class="panel-heading">
+          <h2>Beam and loading</h2>
+          <span class="unit-label">Span: 20 ft</span>
+        </div>
+        <div class="beam-canvas">
+          <svg viewBox="0 0 900 210" role="img" aria-label="Twenty-foot simply supported beam with two point loads and a uniform load">
+            <g stroke="#8d8290" stroke-width="1">
+              <line x1="85" y1="157" x2="85" y2="168"/>
+              <line x1="158" y1="157" x2="158" y2="168"/>
+              <line x1="231" y1="157" x2="231" y2="168"/>
+              <line x1="303" y1="157" x2="303" y2="168"/>
+              <line x1="376" y1="157" x2="376" y2="168"/>
+              <line x1="450" y1="157" x2="450" y2="168"/>
+              <line x1="523" y1="157" x2="523" y2="168"/>
+              <line x1="596" y1="157" x2="596" y2="168"/>
+              <line x1="669" y1="157" x2="669" y2="168"/>
+              <line x1="742" y1="157" x2="742" y2="168"/>
+              <line x1="815" y1="157" x2="815" y2="168"/>
+            </g>
+
+            <g fill="#17151a" text-anchor="middle" font-size="12" font-weight="700">
+              <text x="85" y="198">0 ft</text>
+              <text x="450" y="198">10 ft</text>
+              <text x="815" y="198">20 ft</text>
+              <text x="231" y="198">4 ft</text>
+              <text x="669" y="198">16 ft</text>
+            </g>
+
+            <line class="beam-line" x1="85" y1="148" x2="815" y2="148"/>
+
+            <g fill="#17151a" stroke="#17151a" stroke-width="2" stroke-linejoin="miter">
+              <circle cx="85" cy="148" r="5" fill="#fff"/>
+              <path d="M85 153 L64 178 L106 178 Z"/>
+              <line x1="58" y1="178" x2="112" y2="178" stroke-width="4"/>
+            </g>
+            <g fill="none" stroke="#17151a" stroke-width="2" stroke-linecap="square">
+              <line x1="58" y1="178" x2="68" y2="188"/>
+              <line x1="68" y1="178" x2="78" y2="188"/>
+              <line x1="78" y1="178" x2="88" y2="188"/>
+              <line x1="88" y1="178" x2="98" y2="188"/>
+              <line x1="98" y1="178" x2="108" y2="188"/>
+            </g>
+            <g fill="#17151a" stroke="#17151a" stroke-width="2">
+              <circle cx="815" cy="148" r="5" fill="#fff"/>
+              <path d="M815 153 L794 178 L836 178 Z"/>
+              <line x1="788" y1="178" x2="842" y2="178" stroke-width="4"/>
+            </g>
+            <g fill="none" stroke="#17151a" stroke-width="2" stroke-linecap="square">
+              <line x1="788" y1="178" x2="798" y2="188"/>
+              <line x1="798" y1="178" x2="808" y2="188"/>
+              <line x1="808" y1="178" x2="818" y2="188"/>
+              <line x1="818" y1="178" x2="828" y2="188"/>
+              <line x1="828" y1="178" x2="838" y2="188"/>
+            </g>
+
+            <g fill="none" stroke="#7654a7" stroke-width="2">
+              <path d="M85 112 L815 112"/>
+              <path d="M85 112 L85 128 M158 112 L158 128 M303 112 L303 128 M376 112 L376 128 M450 112 L450 128 M523 112 L523 128 M596 112 L596 128 M742 112 L742 128 M815 112 L815 128"/>
+              <g fill="#7654a7" stroke="none">
+                <path d="M85 142 L79 132 L91 132 Z"/>
+                <path d="M158 142 L152 132 L164 132 Z"/>
+                <path d="M303 142 L297 132 L309 132 Z"/>
+                <path d="M376 142 L370 132 L382 132 Z"/>
+                <path d="M450 142 L444 132 L456 132 Z"/>
+                <path d="M523 142 L517 132 L529 132 Z"/>
+                <path d="M596 142 L590 132 L602 132 Z"/>
+                <path d="M742 142 L736 132 L748 132 Z"/>
+                <path d="M815 142 L809 132 L821 132 Z"/>
+              </g>
+            </g>
+            <g fill="#7654a7" stroke="#503779" stroke-width="1">
+              <line x1="228" y1="48" x2="228" y2="132" stroke="#7654a7" stroke-width="3"/>
+              <path d="M228 142 L218 126 L238 126 Z"/>
+              <line x1="680" y1="48" x2="680" y2="132" stroke="#7654a7" stroke-width="3"/>
+              <path d="M680 142 L670 126 L690 126 Z"/>
+            </g>
+
+            <g fill="#7654a7" text-anchor="middle" font-size="13" font-weight="700">
+              <text x="228" y="38">5.0 kip</text>
+              <text x="680" y="38">3.0 kip</text>
+              <text x="450" y="94">Uniform load: 1.0 kip/ft</text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="metrics-grid" aria-label="Key beam results">
+          <div class="metric">
+            <span class="metric-label">Left reaction</span>
+            <span class="metric-value">10.50 kip</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Right reaction</span>
+            <span class="metric-value">7.50 kip</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Maximum moment</span>
+            <span class="metric-value">54.2 kip-ft</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Maximum deflection</span>
+            <span class="metric-value">0.68 in</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="checks-grid" aria-label="Pass and fail results">
+        <article class="panel check-card">
+          <div class="check-icon" aria-hidden="true">✓</div>
+          <div>
+            <strong>Bending stress</strong>
+            <small>3.82 ksi of 24.00 ksi allowable</small>
+          </div>
+          <span class="pass-pill">Pass</span>
+        </article>
+        <article class="panel check-card">
+          <div class="check-icon fail" aria-hidden="true">×</div>
+          <div>
+            <strong>Deflection</strong>
+            <small>0.68 in of 0.667 in allowable</small>
+          </div>
+          <span class="pass-pill" style="background: var(--red); color: var(--red-text)">Fail</span>
+        </article>
+      </section>
+
+      <section class="plots-grid" aria-label="Beam diagrams">
+        <article class="panel plot-card">
+          <div class="panel-heading">
+            <h2>Shear diagram</h2>
+            <span class="unit-label">kip</span>
+          </div>
+          <svg viewBox="0 0 420 180" role="img" aria-label="Placeholder shear diagram">
+            <line class="grid" x1="35" y1="35" x2="400" y2="35"/>
+            <line class="grid" x1="35" y1="90" x2="400" y2="90"/>
+            <line class="grid" x1="35" y1="145" x2="400" y2="145"/>
+            <line class="axis" x1="35" y1="90" x2="400" y2="90"/>
+            <path class="purple-fill" d="M35 55 L140 55 L140 65 L265 65 L265 115 L400 115 L400 90 L35 90 Z"/>
+            <path class="purple-line" d="M35 55 L140 55 L140 65 L265 65 L265 115 L400 115"/>
+            <g fill="#68616d" font-size="11">
+              <text x="35" y="168">0 ft</text><text x="195" y="168">10 ft</text><text x="385" y="168">20 ft</text>
+              <text x="8" y="58">+10</text><text x="13" y="118">-5</text>
+            </g>
+          </svg>
+        </article>
+
+        <article class="panel plot-card">
+          <div class="panel-heading">
+            <h2>Moment diagram</h2>
+            <span class="unit-label">kip-ft</span>
+          </div>
+          <svg viewBox="0 0 420 180" role="img" aria-label="Placeholder moment diagram">
+            <line class="grid" x1="35" y1="35" x2="400" y2="35"/>
+            <line class="grid" x1="35" y1="90" x2="400" y2="90"/>
+            <line class="grid" x1="35" y1="145" x2="400" y2="145"/>
+            <line class="axis" x1="35" y1="145" x2="400" y2="145"/>
+            <path class="blue-fill" d="M35 145 Q140 68 217 48 Q300 65 400 145 L35 145 Z"/>
+            <path class="blue-line" d="M35 145 Q140 68 217 48 Q300 65 400 145"/>
+            <g fill="#68616d" font-size="11">
+              <text x="35" y="168">0 ft</text><text x="195" y="168">10 ft</text><text x="385" y="168">20 ft</text>
+              <text x="205" y="42">54.2</text>
+            </g>
+          </svg>
+        </article>
+
+        <article class="panel plot-card">
+          <div class="panel-heading">
+            <h2>Deflection diagram</h2>
+            <span class="unit-label">in</span>
+          </div>
+          <svg viewBox="0 0 420 180" role="img" aria-label="Placeholder deflection diagram">
+            <line class="grid" x1="35" y1="35" x2="400" y2="35"/>
+            <line class="grid" x1="35" y1="90" x2="400" y2="90"/>
+            <line class="grid" x1="35" y1="145" x2="400" y2="145"/>
+            <line class="axis" x1="35" y1="90" x2="400" y2="90"/>
+            <path class="peach-fill" d="M35 90 Q140 132 217 138 Q300 132 400 90 L400 90 L35 90 Z"/>
+            <path class="peach-line" d="M35 90 Q140 132 217 138 Q300 132 400 90"/>
+            <g fill="#68616d" font-size="11">
+              <text x="35" y="168">0 ft</text><text x="195" y="168">10 ft</text><text x="385" y="168">20 ft</text>
+              <text x="205" y="154">-0.68</text>
+            </g>
+          </svg>
+        </article>
+      </section>
+
+    </section>
+
+    <aside class="controls" aria-label="Beam controls">
+      <section class="panel control-panel">
+        <div class="panel-heading">
+          <h2>Beam inputs</h2>
+        </div>
+        <div class="control-body">
+          <div class="field">
+            <span class="field-label">Support type</span>
+            <div class="segmented" role="group" aria-label="Support type">
+              <button class="segment active" type="button">Simply supported</button>
+              <button class="segment" type="button">Cantilever</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="span">Span</label>
+            <input id="span" type="number" value="20" min="0.1" step="0.1" aria-describedby="span-unit">
+            <small id="span-unit" class="unit-label">feet</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel control-panel">
+        <div class="panel-heading">
+          <h2>Load inputs</h2>
+          <span class="unit-label">4 total</span>
+        </div>
+        <div class="control-body">
+          <div class="load-card">
+            <div class="load-card-head">
+              <span>Point load 1</span>
+              <button class="remove-load" type="button" aria-label="Remove point load 1">×</button>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="point1-magnitude">Magnitude (kip)</label>
+                <input id="point1-magnitude" type="number" value="5.0" step="0.1">
+              </div>
+              <div class="field">
+                <label for="point1-position">Position (ft)</label>
+                <input id="point1-position" type="number" value="5.0" step="0.1">
+              </div>
+            </div>
+          </div>
+
+          <div class="load-card">
+            <div class="load-card-head">
+              <span>Point load 2</span>
+              <button class="remove-load" type="button" aria-label="Remove point load 2">×</button>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="point2-magnitude">Magnitude (kip)</label>
+                <input id="point2-magnitude" type="number" value="3.0" step="0.1">
+              </div>
+              <div class="field">
+                <label for="point2-position">Position (ft)</label>
+                <input id="point2-position" type="number" value="17.0" step="0.1">
+              </div>
+            </div>
+          </div>
+
+          <div class="load-card">
+            <div class="load-card-head">
+              <span>Uniform load</span>
+              <button class="remove-load" type="button" aria-label="Remove uniform load">×</button>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="uniform-magnitude">Magnitude (kip/ft)</label>
+                <input id="uniform-magnitude" type="number" value="1.0" step="0.1">
+              </div>
+              <div class="field">
+                <label for="uniform-start">From (ft)</label>
+                <input id="uniform-start" type="number" value="0.0" step="0.1">
+              </div>
+            </div>
+            <div class="field" style="margin-top: 8px">
+              <label for="uniform-end">To (ft)</label>
+              <input id="uniform-end" type="number" value="20.0" step="0.1">
+            </div>
+          </div>
+
+          <label class="check-row" for="self-weight">
+            <input id="self-weight" type="checkbox" checked>
+            Include beam self-weight
+          </label>
+
+          <button class="add-button" type="button" id="add-point-load">+ Add point load</button>
+          <button class="add-button" type="button" id="add-uniform-load">+ Add uniform load</button>
+        </div>
+      </section>
+
+      <section class="panel control-panel">
+        <div class="panel-heading">
+          <h2>Member inputs</h2>
+        </div>
+        <div class="control-body">
+          <div class="field">
+            <label for="member-type">Member type</label>
+            <select id="member-type">
+              <option selected>Steel W-shape</option>
+              <option>Lumber</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="designation">Designation / size</label>
+            <select id="designation">
+              <option selected>W12 × 26</option>
+              <option>W10 × 22</option>
+              <option>W16 × 40</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="steel-grade">Steel grade</label>
+              <input id="steel-grade" type="text" value="A992" disabled>
+            </div>
+            <div class="field">
+              <label for="lumber-grade">Lumber grade</label>
+              <input id="lumber-grade" type="text" value="No. 2" disabled>
+            </div>
+          </div>
+          <div class="field">
+            <label for="lumber-species">Lumber species</label>
+            <input id="lumber-species" type="text" value="Douglas Fir-Larch" disabled>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="elastic-modulus">E</label>
+              <input id="elastic-modulus" type="number" value="29000" disabled>
+            </div>
+            <div class="field">
+              <label for="moment-inertia">I</label>
+              <input id="moment-inertia" type="number" value="204" disabled>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="section-modulus">S</label>
+              <input id="section-modulus" type="number" value="33.4" disabled>
+            </div>
+            <div class="field">
+              <label for="allowable-stress">Fb</label>
+              <input id="allowable-stress" type="number" value="24" disabled>
+            </div>
+          </div>
+          <div class="validate-note" role="status">
+            <span aria-hidden="true">✓</span>
+            <span>Example inputs are complete. All values are within the beam span.</span>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    document.querySelectorAll(".segment").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".segment").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+      });
+    });
+
+    document.querySelectorAll(".remove-load").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".load-card");
+        card.style.opacity = "0.45";
+        card.style.borderStyle = "dashed";
+      });
+    });
+
+    document.querySelector("#add-point-load").addEventListener("click", () => {
+      const body = document.querySelector("#add-point-load").parentElement;
+      const card = document.createElement("div");
+      card.className = "load-card";
+      card.innerHTML = '<div class="load-card-head"><span>Point load</span><button class="remove-load" type="button" aria-label="Remove point load">×</button></div><div class="field-row"><div class="field"><label>Magnitude</label><input type="number" value="2.0"></div><div class="field"><label>Position</label><input type="number" value="10.0"></div></div>';
+      body.insertBefore(card, document.querySelector(".check-row"));
+      card.querySelector(".remove-load").addEventListener("click", () => card.remove());
+    });
+
+    document.querySelector("#add-uniform-load").addEventListener("click", () => {
+      const body = document.querySelector("#add-uniform-load").parentElement;
+      const card = document.createElement("div");
+      card.className = "load-card";
+      card.innerHTML = '<div class="load-card-head"><span>Uniform load</span><button class="remove-load" type="button" aria-label="Remove uniform load">×</button></div><div class="field-row"><div class="field"><label>Magnitude</label><input type="number" value="0.5"></div><div class="field"><label>From</label><input type="number" value="0.0"></div></div><div class="field" style="margin-top:8px"><label>To</label><input type="number" value="20.0"></div>';
+      body.insertBefore(card, document.querySelector(".check-row"));
+      card.querySelector(".remove-load").addEventListener("click", () => card.remove());
+    });
+  </script>
 </body>
 </html>

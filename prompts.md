@@ -64,3 +64,57 @@
 - **Asked:** Commit the specification updates.
 - **Changed:** Committed the expanded Beam Designer specification and prompt log updates.
 - **Worked:** Yes.
+
+## 2026-11-18
+
+- **Asked:** Suggest a four-to-six-stage plan for building the app without writing code.
+- **Changed:** Proposed five testable stages covering mockup, inputs, beam and shear/moment output, deflection, and final pass/fail/accessibility work.
+- **Worked:** Not yet implemented; advice only.
+
+## 2026-11-18
+
+- **Asked:** Add the five build stages to the end of spec.md.
+- **Changed:** Appended Build stages with implementation goals and testing checks for layout, controls, force calculations, deflection, and final checks/polish.
+- **Worked:** Yes.
+
+## 2026-11-18
+
+- **Asked:** Build Stage 1 as a static single-file mockup in index.html with no calculations.
+- **Changed:** Created the pink and pastel beam-designer layout, right-side controls, example beam, three plots, key values, pass/fail cards, and basic mockup interactions.
+- **Worked:** Yes. The mockup is complete and contains no beam calculation logic.
+
+## 2026-11-18
+
+- **Asked:** Update the mockup logo, maximum-moment bubble, diagrams, input labels, and pass/fail placement.
+- **Changed:** Removed the logo letter, made maximum moment pastel green, standardized all diagrams to the shear purple, labeled right-side sections as inputs, and moved pass/fail cards directly below reaction and result metrics.
+- **Worked:** Pending browser verification.
+
+## 2026-11-18
+
+- **Asked:** Stack the diagrams vertically, replace the logo with a panda, and sharpen the beam/loading drawing.
+- **Changed:** Changed diagrams to a one-column layout, replaced the square logo content with a panda emoji, and added crisp beam/support lines, length ticks, a distinct uniform-load line, and point-load arrows.
+- **Worked:** Pending browser verification.
+
+## 2026-11-18
+
+- **Asked:** Add load arrows, use red failure icons, and make supports hold the beam.
+- **Changed:** Added downward arrows for distributed and point loads, changed the deflection fail card to a red ×, and made black grounded support triangles, hatching, and circles contact the beam.
+- **Worked:** Yes by source verification.
+
+## 2026-11-18
+
+- **Asked:** Separate point and distributed-load arrows, make the panda monochrome and cute, and place supports below the beam.
+- **Changed:** Kept distributed arrows evenly spaced with the point-load positions omitted, moved point loads to a separate upper band, replaced the logo with a black-and-white SVG panda, and refined black triangular supports below the beam.
+- **Worked:** Pending browser verification.
+
+## 2026-11-18
+
+- **Asked:** Make the panda more kawaii and move point-load labels directly above each point load.
+- **Changed:** Replaced the panda face with a softer round kawaii-style SVG and repositioned both point-load labels above their corresponding arrows.
+- **Worked:** Yes by source verification.
+
+## 2026-11-18
+
+- **Asked:** Add a light pastel-purple rounded square behind the panda and make its ears smaller.
+- **Changed:** Added the #e7dafa tile styling and reduced both panda ear circles.
+- **Worked:** Yes by source verification.
