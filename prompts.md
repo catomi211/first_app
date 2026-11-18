@@ -142,3 +142,9 @@
 - **Asked:** Change only the deflection failure ×, making it thicker and centered.
 - **Changed:** Replaced the failure text × with a centered thick SVG × and made no other design changes.
 - **Worked:** Yes by source verification.
+
+## 2026-11-18
+
+- **Asked:** Build Stage 2 of spec.md with interactive controls and validation, keeping calculations separate from drawing code.
+- **Changed:** Added live support/member selection, load add/remove controls, span and load/member validation, member property updates, hidden placeholder results for invalid input, and named calculation functions for counts, member properties, and validation state.
+- **Worked:** Source verification only; browser automation was unavailable.

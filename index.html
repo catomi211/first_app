@@ -390,6 +390,18 @@
       line-height: 1.35;
     }
 
+    .validate-note.error {
+      background: var(--red);
+      color: var(--red-text);
+    }
+
+    input.invalid, select.invalid {
+      border: 2px solid var(--red-text);
+      background: #fff7f7;
+    }
+
+    [hidden] { display: none !important; }
+
     .axis { stroke: #8d8290; stroke-width: 1; }
     .grid { stroke: #eee6ef; stroke-width: 1; }
     .beam-line { stroke: var(--ink); stroke-width: 6; stroke-linecap: square; }
@@ -457,7 +469,7 @@
       <section class="panel beam-panel">
         <div class="panel-heading">
           <h2>Beam and loading</h2>
-          <span class="unit-label">Span: 20 ft</span>
+          <span class="unit-label" id="span-readout">Span: 20 ft</span>
         </div>
         <div class="beam-canvas">
           <svg viewBox="0 0 900 210" role="img" aria-label="Twenty-foot simply supported beam with two point loads and a uniform load">
@@ -540,7 +552,7 @@
           </svg>
         </div>
 
-        <div class="metrics-grid" aria-label="Key beam results">
+        <div class="metrics-grid" id="key-results" aria-label="Key beam results">
           <div class="metric">
             <span class="metric-label">Left reaction</span>
             <span class="metric-value">10.50 kip</span>
@@ -560,7 +572,7 @@
         </div>
       </section>
 
-      <section class="checks-grid" aria-label="Pass and fail results">
+      <section class="checks-grid" id="pass-fail-results" aria-label="Pass and fail results">
         <article class="panel check-card">
           <svg class="check-icon" viewBox="0 0 38 38" aria-hidden="true">
             <path d="M10 20 L16 26 L28 13" fill="none" stroke="#2f6842" stroke-width="6" stroke-linecap="square" stroke-linejoin="miter"/>
@@ -583,7 +595,7 @@
         </article>
       </section>
 
-      <section class="plots-grid" aria-label="Beam diagrams">
+      <section class="plots-grid" id="diagram-results" aria-label="Beam diagrams">
         <article class="panel plot-card">
           <div class="panel-heading">
             <h2>Shear diagram</h2>
@@ -671,7 +683,7 @@
           <span class="unit-label">4 total</span>
         </div>
         <div class="control-body">
-          <div class="load-card">
+          <div class="load-card" data-load-type="point">
             <div class="load-card-head">
               <span>Point load 1</span>
               <button class="remove-load" type="button" aria-label="Remove point load 1">×</button>
@@ -679,16 +691,16 @@
             <div class="field-row">
               <div class="field">
                 <label for="point1-magnitude">Magnitude (kip)</label>
-                <input id="point1-magnitude" type="number" value="5.0" step="0.1">
+                <input id="point1-magnitude" type="number" value="5.0" step="0.1" data-field="magnitude">
               </div>
               <div class="field">
                 <label for="point1-position">Position (ft)</label>
-                <input id="point1-position" type="number" value="5.0" step="0.1">
+                <input id="point1-position" type="number" value="5.0" step="0.1" data-field="position">
               </div>
             </div>
           </div>
 
-          <div class="load-card">
+          <div class="load-card" data-load-type="point">
             <div class="load-card-head">
               <span>Point load 2</span>
               <button class="remove-load" type="button" aria-label="Remove point load 2">×</button>
@@ -696,16 +708,16 @@
             <div class="field-row">
               <div class="field">
                 <label for="point2-magnitude">Magnitude (kip)</label>
-                <input id="point2-magnitude" type="number" value="3.0" step="0.1">
+                <input id="point2-magnitude" type="number" value="3.0" step="0.1" data-field="magnitude">
               </div>
               <div class="field">
                 <label for="point2-position">Position (ft)</label>
-                <input id="point2-position" type="number" value="17.0" step="0.1">
+                <input id="point2-position" type="number" value="17.0" step="0.1" data-field="position">
               </div>
             </div>
           </div>
 
-          <div class="load-card">
+          <div class="load-card" data-load-type="uniform">
             <div class="load-card-head">
               <span>Uniform load</span>
               <button class="remove-load" type="button" aria-label="Remove uniform load">×</button>
@@ -713,16 +725,16 @@
             <div class="field-row">
               <div class="field">
                 <label for="uniform-magnitude">Magnitude (kip/ft)</label>
-                <input id="uniform-magnitude" type="number" value="1.0" step="0.1">
+                <input id="uniform-magnitude" type="number" value="1.0" step="0.1" data-field="magnitude">
               </div>
               <div class="field">
                 <label for="uniform-start">From (ft)</label>
-                <input id="uniform-start" type="number" value="0.0" step="0.1">
+                <input id="uniform-start" type="number" value="0.0" step="0.1" data-field="start">
               </div>
             </div>
             <div class="field" style="margin-top: 8px">
               <label for="uniform-end">To (ft)</label>
-              <input id="uniform-end" type="number" value="20.0" step="0.1">
+              <input id="uniform-end" type="number" value="20.0" step="0.1" data-field="end">
             </div>
           </div>
 
@@ -800,38 +812,247 @@
   </main>
 
   <script>
+    function getNumericValue(input) {
+      if (!input || input.value.trim() === "") return null;
+      const value = Number(input.value);
+      return Number.isFinite(value) ? value : null;
+    }
+
+    function calculatePointLoadCount() {
+      return document.querySelectorAll('.load-card[data-load-type="point"]').length;
+    }
+
+    function calculateUniformLoadCount() {
+      return document.querySelectorAll('.load-card[data-load-type="uniform"]').length;
+    }
+
+    function calculateLoadCount() {
+      return calculatePointLoadCount() + calculateUniformLoadCount();
+    }
+
+    function calculateMemberProperties(memberType, designation) {
+      const steelProperties = {
+        "W12 × 26": { E: 29000, I: 204, S: 33.4, Fb: 24 },
+        "W10 × 22": { E: 29000, I: 118, S: 26.4, Fb: 24 },
+        "W16 × 40": { E: 29000, I: 518, S: 64.7, Fb: 24 }
+      };
+      const lumberProperties = {
+        "2 × 12": { E: 1600, I: 178, S: 31.64, Fb: 1.45 },
+        "2 × 10": { E: 1600, I: 98.93, S: 21.39, Fb: 1.45 },
+        "4 × 12": { E: 1600, I: 570, S: 95, Fb: 1.45 }
+      };
+      return memberType === "Lumber"
+        ? lumberProperties[designation] || lumberProperties["2 × 12"]
+        : steelProperties[designation] || steelProperties["W12 × 26"];
+    }
+
+    function validateBeamInputs() {
+      const errors = [];
+      document.querySelectorAll("input.invalid, select.invalid").forEach((input) => input.classList.remove("invalid"));
+
+      const spanInput = document.querySelector("#span");
+      const span = getNumericValue(spanInput);
+      if (span === null || span <= 0) {
+        errors.push("Span must be greater than 0 ft.");
+        spanInput.classList.add("invalid");
+      } else {
+        document.querySelector("#span-readout").textContent = `Span: ${span.toFixed(1)} ft`;
+      }
+
+      document.querySelectorAll('.load-card[data-load-type="point"]').forEach((card) => {
+        const magnitudeInput = card.querySelector('[data-field="magnitude"]');
+        const positionInput = card.querySelector('[data-field="position"]');
+        const magnitude = getNumericValue(magnitudeInput);
+        const position = getNumericValue(positionInput);
+
+        if (magnitude === null || magnitude <= 0) {
+          errors.push("Every point-load magnitude must be greater than 0 kip.");
+          magnitudeInput.classList.add("invalid");
+        }
+        if (position === null || span === null || position < 0 || position > span) {
+          errors.push("Every point-load position must be within the beam span.");
+          positionInput.classList.add("invalid");
+        }
+      });
+
+      document.querySelectorAll('.load-card[data-load-type="uniform"]').forEach((card) => {
+        const magnitudeInput = card.querySelector('[data-field="magnitude"]');
+        const startInput = card.querySelector('[data-field="start"]');
+        const endInput = card.querySelector('[data-field="end"]');
+        const magnitude = getNumericValue(magnitudeInput);
+        const start = getNumericValue(startInput);
+        const end = getNumericValue(endInput);
+
+        if (magnitude === null || magnitude <= 0) {
+          errors.push("Every uniform-load magnitude must be greater than 0 kip/ft.");
+          magnitudeInput.classList.add("invalid");
+        }
+        if (start === null || span === null || start < 0 || start >= span) {
+          errors.push("Uniform-load start positions must be within the beam span.");
+          startInput.classList.add("invalid");
+        }
+        if (end === null || span === null || end <= 0 || end > span) {
+          errors.push("Uniform-load end positions must be within the beam span.");
+          endInput.classList.add("invalid");
+        }
+        if (start !== null && end !== null && start >= end) {
+          errors.push("Uniform-load start position must be less than end position.");
+          startInput.classList.add("invalid");
+          endInput.classList.add("invalid");
+        }
+      });
+
+      const designationInput = document.querySelector("#designation");
+      if (!designationInput.value) {
+        errors.push("A member designation or size is required.");
+        designationInput.classList.add("invalid");
+      }
+
+      return errors;
+    }
+
+    function updateValidationStatus() {
+      const errors = validateBeamInputs();
+      const note = document.querySelector(".validate-note");
+      const noteText = note.querySelector("span:last-child");
+      const noteIcon = note.querySelector("span:first-child");
+      const resultIds = ["key-results", "pass-fail-results", "diagram-results"];
+
+      if (errors.length > 0) {
+        note.classList.add("error");
+        noteIcon.textContent = "!";
+        noteText.textContent = errors[0];
+        resultIds.forEach((id) => document.querySelector(`#${id}`).hidden = true);
+      } else {
+        note.classList.remove("error");
+        noteIcon.textContent = "✓";
+        noteText.textContent = `Example inputs are complete. ${calculateLoadCount()} load${calculateLoadCount() === 1 ? "" : "s"} entered.`;
+        resultIds.forEach((id) => document.querySelector(`#${id}`).hidden = false);
+      }
+    }
+
+    function updateLoadCount() {
+      const count = calculateLoadCount();
+      document.querySelector(".load-card").closest(".control-panel").querySelector(".unit-label").textContent =
+        `${count} total`;
+    }
+
+    function bindLoadCard(card) {
+      card.querySelectorAll("input").forEach((input) => input.addEventListener("input", updateValidationStatus));
+      card.querySelector(".remove-load").addEventListener("click", () => {
+        card.remove();
+        updateValidationStatus();
+        updateLoadCount();
+      });
+    }
+
+    function createPointLoadCard() {
+      const card = document.createElement("div");
+      card.className = "load-card";
+      card.dataset.loadType = "point";
+      card.innerHTML = `
+        <div class="load-card-head">
+          <span>Point load</span>
+          <button class="remove-load" type="button" aria-label="Remove point load">×</button>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Magnitude (kip)</label>
+            <input type="number" value="2.0" min="0.1" step="0.1" data-field="magnitude">
+          </div>
+          <div class="field">
+            <label>Position (ft)</label>
+            <input type="number" value="10.0" min="0" step="0.1" data-field="position">
+          </div>
+        </div>`;
+      return card;
+    }
+
+    function createUniformLoadCard() {
+      const card = document.createElement("div");
+      card.className = "load-card";
+      card.dataset.loadType = "uniform";
+      card.innerHTML = `
+        <div class="load-card-head">
+          <span>Uniform load</span>
+          <button class="remove-load" type="button" aria-label="Remove uniform load">×</button>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Magnitude (kip/ft)</label>
+            <input type="number" value="0.5" min="0.1" step="0.1" data-field="magnitude">
+          </div>
+          <div class="field">
+            <label>From (ft)</label>
+            <input type="number" value="0.0" min="0" step="0.1" data-field="start">
+          </div>
+        </div>
+        <div class="field" style="margin-top: 8px">
+          <label>To (ft)</label>
+          <input type="number" value="20.0" min="0" step="0.1" data-field="end">
+        </div>`;
+      return card;
+    }
+
+    function updateMemberOptions() {
+      const memberType = document.querySelector("#member-type").value;
+      const designation = document.querySelector("#designation");
+      const isSteel = memberType === "Steel W-shape";
+      designation.innerHTML = isSteel
+        ? '<option selected>W12 × 26</option><option>W10 × 22</option><option>W16 × 40</option>'
+        : '<option selected>2 × 12</option><option>2 × 10</option><option>4 × 12</option>';
+
+      document.querySelector("#steel-grade").disabled = !isSteel;
+      document.querySelector("#lumber-grade").disabled = isSteel;
+      document.querySelector("#lumber-species").disabled = isSteel;
+      updateMemberProperties();
+    }
+
+    function updateMemberProperties() {
+      const memberType = document.querySelector("#member-type").value;
+      const designation = document.querySelector("#designation").value;
+      const properties = calculateMemberProperties(memberType, designation);
+      document.querySelector("#elastic-modulus").value = properties.E;
+      document.querySelector("#moment-inertia").value = properties.I;
+      document.querySelector("#section-modulus").value = properties.S;
+      document.querySelector("#allowable-stress").value = properties.Fb;
+      updateValidationStatus();
+    }
+
     document.querySelectorAll(".segment").forEach((button) => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".segment").forEach((item) => item.classList.remove("active"));
         button.classList.add("active");
+        updateValidationStatus();
       });
     });
 
-    document.querySelectorAll(".remove-load").forEach((button) => {
-      button.addEventListener("click", () => {
-        const card = button.closest(".load-card");
-        card.style.opacity = "0.45";
-        card.style.borderStyle = "dashed";
-      });
-    });
+    document.querySelectorAll(".load-card").forEach(bindLoadCard);
+    document.querySelector("#span").addEventListener("input", updateValidationStatus);
+    document.querySelector("#member-type").addEventListener("change", updateMemberOptions);
+    document.querySelector("#designation").addEventListener("change", updateMemberProperties);
+    document.querySelector("#self-weight").addEventListener("change", updateValidationStatus);
 
     document.querySelector("#add-point-load").addEventListener("click", () => {
+      const card = createPointLoadCard();
       const body = document.querySelector("#add-point-load").parentElement;
-      const card = document.createElement("div");
-      card.className = "load-card";
-      card.innerHTML = '<div class="load-card-head"><span>Point load</span><button class="remove-load" type="button" aria-label="Remove point load">×</button></div><div class="field-row"><div class="field"><label>Magnitude</label><input type="number" value="2.0"></div><div class="field"><label>Position</label><input type="number" value="10.0"></div></div>';
       body.insertBefore(card, document.querySelector(".check-row"));
-      card.querySelector(".remove-load").addEventListener("click", () => card.remove());
+      bindLoadCard(card);
+      updateValidationStatus();
+      updateLoadCount();
     });
 
     document.querySelector("#add-uniform-load").addEventListener("click", () => {
+      const card = createUniformLoadCard();
       const body = document.querySelector("#add-uniform-load").parentElement;
-      const card = document.createElement("div");
-      card.className = "load-card";
-      card.innerHTML = '<div class="load-card-head"><span>Uniform load</span><button class="remove-load" type="button" aria-label="Remove uniform load">×</button></div><div class="field-row"><div class="field"><label>Magnitude</label><input type="number" value="0.5"></div><div class="field"><label>From</label><input type="number" value="0.0"></div></div><div class="field" style="margin-top:8px"><label>To</label><input type="number" value="20.0"></div>';
       body.insertBefore(card, document.querySelector(".check-row"));
-      card.querySelector(".remove-load").addEventListener("click", () => card.remove());
+      bindLoadCard(card);
+      updateValidationStatus();
+      updateLoadCount();
     });
+
+    updateMemberOptions();
+    updateValidationStatus();
   </script>
 </body>
 </html>
