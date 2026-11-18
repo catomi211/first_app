@@ -157,6 +157,18 @@
 
 ## 2026-11-18
 
+- **Asked:** Build Stage 4 of spec.md: elastic deflection calculations and deflection diagram only.
+- **Changed:** Added named deflection calculation and plot functions using EI, beam support boundary conditions, numerical curvature integration, maximum absolute deflection, and live metric updates.
+- **Worked:** Source structure verified; browser automation was unavailable.
+
+## 2026-11-18
+
+- **Asked:** Build Stage 5 of spec.md: bending stress, deflection limit checks, live statuses, and final polish.
+- **Changed:** Added named bending-stress and deflection-check functions, live governing locations and allowable values, dynamic pass/fail icons and pills, and live recalculation after valid edits.
+- **Worked:** Source structure verified; browser automation was unavailable.
+
+## 2026-11-18
+
 - **Asked:** Make spec.md match the current Beam Designer HTML, especially look-and-feel details and reversed load-arrowheads.
 - **Changed:** Added panda branding, stacked diagrams, metric/check placement, control section names, crisp black supports, tick marks, point/distributed-load separation, reversed arrowheads, and thick pass/fail icons to the spec. Updated the HTML arrowhead geometry consistently.
 - **Worked:** Yes by source review.

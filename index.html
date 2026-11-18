@@ -567,31 +567,31 @@
           </div>
           <div class="metric">
             <span class="metric-label">Maximum deflection</span>
-            <span class="metric-value">0.68 in</span>
+            <span class="metric-value" id="max-deflection-output">0.68 in</span>
           </div>
         </div>
       </section>
 
       <section class="checks-grid" id="pass-fail-results" aria-label="Pass and fail results">
         <article class="panel check-card">
-          <svg class="check-icon" viewBox="0 0 38 38" aria-hidden="true">
+          <svg class="check-icon" id="bending-icon" viewBox="0 0 38 38" aria-hidden="true">
             <path d="M10 20 L16 26 L28 13" fill="none" stroke="#2f6842" stroke-width="6" stroke-linecap="square" stroke-linejoin="miter"/>
           </svg>
           <div>
             <strong>Bending stress</strong>
-            <small>3.82 ksi of 24.00 ksi allowable</small>
+            <small id="bending-result">3.82 ksi of 24.00 ksi allowable</small>
           </div>
-          <span class="pass-pill">Pass</span>
+          <span class="pass-pill" id="bending-status">Pass</span>
         </article>
         <article class="panel check-card">
-          <svg class="check-icon fail" viewBox="0 0 38 38" aria-hidden="true">
+          <svg class="check-icon fail" id="deflection-icon" viewBox="0 0 38 38" aria-hidden="true">
             <path d="M12 12 L26 26 M26 12 L12 26" fill="none" stroke="#8a3838" stroke-width="5" stroke-linecap="square"/>
           </svg>
           <div>
             <strong>Deflection</strong>
-            <small>0.68 in of 0.667 in allowable</small>
+            <small id="deflection-result">0.68 in of 0.667 in allowable</small>
           </div>
-          <span class="pass-pill" style="background: var(--red); color: var(--red-text)">Fail</span>
+          <span class="pass-pill" id="deflection-status" style="background: var(--red); color: var(--red-text)">Fail</span>
         </article>
       </section>
 
@@ -639,7 +639,7 @@
             <h2>Deflection diagram</h2>
             <span class="unit-label">in</span>
           </div>
-          <svg viewBox="0 0 420 180" role="img" aria-label="Placeholder deflection diagram">
+          <svg id="deflection-plot" viewBox="0 0 420 180" role="img" aria-label="Calculated deflection diagram">
             <line class="grid" x1="35" y1="35" x2="400" y2="35"/>
             <line class="grid" x1="35" y1="90" x2="400" y2="90"/>
             <line class="grid" x1="35" y1="145" x2="400" y2="145"/>
@@ -1010,6 +1010,179 @@
       };
     }
 
+    function calculateDeflection(model, shearAndMomentResults) {
+      const memberType = document.querySelector("#member-type").value;
+      const designation = document.querySelector("#designation").value;
+      const member = calculateMemberProperties(memberType, designation);
+      const lengthInches = model.span * 12;
+      const EI = member.E * member.I;
+      const momentPoints = shearAndMomentResults.points;
+      const dx = momentPoints.length > 1
+        ? (lengthInches / (momentPoints.length - 1))
+        : lengthInches;
+
+      const curvaturePoints = momentPoints.map((point) => ({
+        x: point.x * 12,
+        curvature: -(point.moment * 12) / EI
+      }));
+
+      const rotationPoints = [{ x: 0, rotation: 0 }];
+      let rotation = 0;
+
+      for (let i = 1; i < curvaturePoints.length; i++) {
+        const previous = curvaturePoints[i - 1];
+        const current = curvaturePoints[i];
+        rotation += (previous.curvature + current.curvature) * dx / 2;
+        rotationPoints.push({ x: current.x, rotation });
+      }
+
+      const deflectionPoints = [{ x: 0, deflection: 0 }];
+      let deflection = 0;
+      for (let i = 1; i < rotationPoints.length; i++) {
+        const previous = rotationPoints[i - 1];
+        const current = rotationPoints[i];
+        deflection += (previous.rotation + current.rotation) * dx / 2;
+        deflectionPoints.push({ x: current.x, deflection });
+      }
+
+      if (model.supportType !== "Cantilever" && deflectionPoints.length > 1) {
+        const endDeflection = deflectionPoints[deflectionPoints.length - 1].deflection;
+        const correctedRotationShift = endDeflection / lengthInches;
+        for (const point of deflectionPoints) {
+          point.deflection -= correctedRotationShift * point.x;
+        }
+        deflectionPoints[0].deflection = 0;
+        deflectionPoints[deflectionPoints.length - 1].deflection = 0;
+      }
+
+      let maxAbsoluteDeflection = 0;
+      let governingDeflectionLocation = 0;
+      deflectionPoints.forEach((point) => {
+        if (Math.abs(point.deflection) > Math.abs(maxAbsoluteDeflection)) {
+          maxAbsoluteDeflection = point.deflection;
+          governingDeflectionLocation = point.x / 12;
+        }
+      });
+
+      return {
+        EI,
+        points: deflectionPoints,
+        maxAbsoluteDeflection,
+        governingDeflectionLocation
+      };
+    }
+
+    function drawDeflectionPlot(deflectionResults) {
+      const plot = document.querySelector("#deflection-plot");
+      if (!plot || !deflectionResults.points.length) return;
+
+      const left = 35;
+      const right = 400;
+      const axisY = 90;
+      const top = 35;
+      const bottom = 145;
+      const lengthInches = deflectionResults.points[deflectionResults.points.length - 1].x || 1;
+      const magnitude = Math.max(
+        ...deflectionResults.points.map((point) => Math.abs(point.deflection)),
+        0.001
+      );
+      const xScale = (right - left) / lengthInches;
+      const yScale = (bottom - top) / (2 * magnitude);
+      const linePath = deflectionResults.points.map((point, index) => {
+        const x = left + point.x * xScale;
+        const y = axisY - point.deflection * yScale;
+        return `${index === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)}`;
+      }).join(" ");
+
+      plot.innerHTML = `
+        <line class="grid" x1="35" y1="35" x2="400" y2="35"/>
+        <line class="grid" x1="35" y1="90" x2="400" y2="90"/>
+        <line class="grid" x1="35" y1="145" x2="400" y2="145"/>
+        <line class="axis" x1="35" y1="90" x2="400" y2="90"/>
+        <path class="peach-fill" d="${linePath} L${right} ${axisY} L${left} ${axisY} Z"/>
+        <path class="peach-line" d="${linePath}"/>
+        <g fill="#68616d" font-size="11">
+          <text x="35" y="168">0 ft</text>
+          <text x="195" y="168">${(lengthInches / 24).toFixed(1)} ft</text>
+          <text x="385" y="168">${(lengthInches / 12).toFixed(1)} ft</text>
+          <text x="205" y="154">${deflectionResults.maxAbsoluteDeflection.toFixed(3)} in</text>
+        </g>`;
+    }
+
+    function updateStageFourResults() {
+      const model = collectBeamModel();
+      const shearAndMoment = calculateShearAndMoment(model);
+      const deflection = calculateDeflection(model, shearAndMoment);
+      document.querySelector("#max-deflection-output").textContent =
+        `${Math.abs(deflection.maxAbsoluteDeflection).toFixed(3)} in`;
+      drawDeflectionPlot(deflection);
+      return { deflection, shearAndMoment };
+    }
+
+    function calculateBendingStress(model, shearAndMomentResults) {
+      const memberType = document.querySelector("#member-type").value;
+      const designation = document.querySelector("#designation").value;
+      const member = calculateMemberProperties(memberType, designation);
+      const momentKipIn = Math.abs(shearAndMomentResults.maxAbsoluteMoment) * 12;
+      const stress = member.S > 0 ? momentKipIn / member.S : Infinity;
+      return {
+        stress,
+        allowable: member.Fb,
+        passes: stress <= member.Fb,
+        location: shearAndMomentResults.governingMomentLocation
+      };
+    }
+
+    function calculateDeflectionCheck(model, deflectionResults) {
+      const allowable = model.span * 12 / 360;
+      const actual = Math.abs(deflectionResults.maxAbsoluteDeflection);
+      return {
+        actual,
+        allowable,
+        passes: actual <= allowable,
+        location: deflectionResults.governingDeflectionLocation
+      };
+    }
+
+    function renderStatusIcon(svg, passes, type) {
+      svg.classList.toggle("fail", !passes);
+      if (passes) {
+        svg.innerHTML = '<path d="M10 20 L16 26 L28 13" fill="none" stroke="#2f6842" stroke-width="6" stroke-linecap="square" stroke-linejoin="miter"/>';
+      } else {
+        svg.innerHTML = '<path d="M12 12 L26 26 M26 12 L12 26" fill="none" stroke="#8a3838" stroke-width="5" stroke-linecap="square"/>';
+      }
+      svg.setAttribute("aria-label", `${type} ${passes ? "passes" : "fails"}`);
+    }
+
+    function renderStatusPill(pill, passes) {
+      pill.textContent = passes ? "Pass" : "Fail";
+      if (passes) {
+        pill.style.background = "var(--green)";
+        pill.style.color = "var(--green-text)";
+      } else {
+        pill.style.background = "var(--red)";
+        pill.style.color = "var(--red-text)";
+      }
+    }
+
+    function updateStageFiveResults() {
+      const model = collectBeamModel();
+      const shearAndMoment = calculateShearAndMoment(model);
+      const deflection = calculateDeflection(model, shearAndMoment);
+      const bending = calculateBendingStress(model, shearAndMoment);
+      const deflectionCheck = calculateDeflectionCheck(model, deflection);
+
+      document.querySelector("#bending-result").textContent =
+        `${bending.stress.toFixed(2)} ksi of ${bending.allowable.toFixed(2)} ksi allowable at ${bending.location.toFixed(1)} ft`;
+      document.querySelector("#deflection-result").textContent =
+        `${deflectionCheck.actual.toFixed(3)} in of ${deflectionCheck.allowable.toFixed(3)} in allowable at ${deflectionCheck.location.toFixed(1)} ft`;
+
+      renderStatusIcon(document.querySelector("#bending-icon"), bending.passes, "Bending stress");
+      renderStatusIcon(document.querySelector("#deflection-icon"), deflectionCheck.passes, "Deflection");
+      renderStatusPill(document.querySelector("#bending-status"), bending.passes);
+      renderStatusPill(document.querySelector("#deflection-status"), deflectionCheck.passes);
+    }
+
     function drawPathFromPoints(svg, points, valueKey, axisY, top, bottom, left = 35, right = 400) {
       if (!points.length) return;
       const span = points[points.length - 1].x || 1;
@@ -1178,6 +1351,7 @@
         `${Math.abs(results.maxAbsoluteMoment).toFixed(2)} kip-ft`;
       drawBeamModel(model);
       drawShearAndMomentPlots(results);
+      updateStageFourResults();
     }
 
     function validateBeamInputs() {
@@ -1263,6 +1437,7 @@
         noteText.textContent = `Example inputs are complete. ${calculateLoadCount()} load${calculateLoadCount() === 1 ? "" : "s"} entered.`;
         resultIds.forEach((id) => document.querySelector(`#${id}`).hidden = false);
         updateStageThreeResults();
+        updateStageFiveResults();
       }
     }
 
